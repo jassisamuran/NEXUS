@@ -1,21 +1,4 @@
-import os
-from functools import lru_cache
 
-from pydantic_settings import BaseSettings
-
-
-class Settings(BaseSettings):
-    APP_NAME: str = "NEXUS"
-    APP_VERSION: str = "1.0.0"
-    DEBUG = False
-    SECRET_KEY = "DFWF22"
-
-    #
-    DATABASE: str = ""
-    # app/config.py
-
-
-import os
 from functools import lru_cache
 
 from pydantic_settings import BaseSettings
@@ -73,7 +56,6 @@ def get_settings() -> Settings:
 settings = get_settings()
 
 
-# AutoGen LLM configs
 def get_llm_config(fast: bool = False):
     model = settings.OPENAI_MODEL_FAST if fast else settings.OPENAI_MODEL
     return {
