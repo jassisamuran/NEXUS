@@ -1,5 +1,8 @@
 import hashlib
 import os
+
+os.environ["ANONYMIZED_TELEMETRY"] = "False"
+
 from typing import Callable, List
 
 import chromadb
@@ -91,7 +94,8 @@ def index_repository(
                 f"{task_id}:{chunk.filepath}:{chunk.name}:{chunk.start_line}".encode()
             ).hexdigest()
 
-            doc = f"File: {chunk.filepath}\nType: {chunk.chunk_type}\nName: {chunk.name or ''}\n\n{chunk.context}"
+            doc = f"File: {chunk.filepath}\nType: {chunk.chunk_type}\nName: {chunk.name or ''}\n\n{chunk.content}"
+
             if chunk.docstring:
                 doc = f"Docstring: {chunk.docstring}\n\n" + doc
 
@@ -122,19 +126,23 @@ def _chunk_generic_file(filepath: str, repo_root: str, ext: str) -> List[CodeChu
     """Split non-Python files into chunks"""
     try:
         with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
-            context = f.read()
+            content = f.read()
+
     except Exception:
         return []
 
     relative_path = os.path.relpath(filepath, repo_root)
     chunks = []
-    lines = context.splitlines()
+    lines = content.splitlines()
+
     chunk_size = 80
 
     for i in range(0, len(lines), chunk_size):
         chunk_content = "\n".join(lines[i : i + chunk_size])
         if chunk_content.strip():
-            from app.rag.ast_parser import CodeChunk
+            from rag.ast_parser import CodeChunk
+
+
 
             chunks.append(
                 CodeChunk(

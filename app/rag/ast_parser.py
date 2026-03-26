@@ -8,7 +8,7 @@ from typing import List, Optional
 class CodeChunk:
     """A meaningful chunk of code with metadata."""
 
-    context: str
+    content: str
     filepath: str
     chunk_type: str
     name: Optional[str]
