@@ -1,22 +1,67 @@
+
+# ----------------------
+# Python
+# ----------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+
+# Virtual environment
 myenv/
-myvenv/
 venv/
-.env
-__pycache__/
-*.pyc
-myenv/
-.env
-__pycache__/
-*.pyc
-chroma/myenv/
+.venv/
+
+# ----------------------
+# ChromaDB (VERY IMPORTANT)
+# ----------------------
 chroma/
-.env
-__pycache__/
-*.pyc
-myenv/
-chroma/
-chroma/data
-.env
-__pycache__/
-*.pyc
 chroma_data/
+chroma.log/
+
+# ----------------------
+# Cloned repositories (your github tools)
+# ----------------------
+repos/
+test_clone/
+
+# ----------------------
+# Environment / secrets
+# ----------------------
+.env
+.env.*
+
+# ----------------------
+# Logs
+# ----------------------
+*.log
+
+# ----------------------
+# OS files
+# ----------------------
+.DS_Store
+Thumbs.db
+
+# ----------------------
+# IDE
+# ----------------------
+.vscode/
+.idea/
+
+# ----------------------
+# Build / dist
+# ----------------------
+dist/
+build/
+*.egg-info/
+
+# ----------------------
+# Node (just in case)
+# ----------------------
+node_modules/
+myenv/
+
+.env
+.env
+.env

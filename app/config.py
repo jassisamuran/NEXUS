@@ -20,7 +20,7 @@ class Settings(BaseSettings):
 
     # ChromaDB
     CHROMA_HOST: str = "localhost"
-    CHROMA_PORT: int = 8001
+    CHROMA_PORT: int = 8000
 
     # JWT
     JWT_SECRET: str = "jwt-secret-change-this-too"
@@ -30,7 +30,7 @@ class Settings(BaseSettings):
 
     # OpenAI
     OPENAI_API_KEY: str = ""
-    OPENAI_MODEL: str = "gpt-4o"
+    OPENAI_MODEL: str = "gpt-4o-mini"
     OPENAI_MODEL_FAST: str = "gpt-4o-mini"
 
     # GitHub
@@ -46,6 +46,7 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
+        extra = "ignore"
 
 
 @lru_cache()
