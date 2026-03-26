@@ -31,3 +31,4 @@ app.add_middleware(
 )
 
 # app.mount("/static", StaticFiles(directory="frontend/assets"), name="static")
+

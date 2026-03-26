@@ -4,6 +4,7 @@ uvicorn[standard]==0.30.0
 
 # Pydantic
 pydantic==2.10.3
+
 pydantic-settings==2.3.0
 
 # Database
@@ -25,6 +26,7 @@ celery==5.4.0
 pyautogen==0.10.0
 autogen-core==0.7.5
 autogen-agentchat==0.7.5
+
 openai==1.30.0
 
 # Vector DB + RAG
@@ -35,6 +37,7 @@ sentence-transformers==2.6.1
 PyGithub==2.3.0
 gitpython==3.1.43
 numpy==1.26.4
+
 # Streaming
 websockets==12.0
 aiofiles==23.2.1
