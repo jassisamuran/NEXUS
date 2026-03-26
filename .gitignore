@@ -61,3 +61,6 @@ build/
 node_modules/
 myenv/
 
+.env
+.env
+.env
