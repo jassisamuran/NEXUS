@@ -1,7 +1,9 @@
+# FastAPI + Uvicorn
 fastapi==0.115.0
 uvicorn[standard]==0.30.0
-python-dotenv==1.0.0
-pydantic==2.7.0
+
+# Pydantic
+pydantic==2.10.3
 pydantic-settings==2.3.0
 
 # Database
@@ -20,17 +22,19 @@ redis==5.0.4
 celery==5.4.0
 
 # AutoGen + AI
-pyautogen==0.2.38
+pyautogen==0.10.0
+autogen-core==0.7.5
+autogen-agentchat==0.7.5
 openai==1.30.0
 
 # Vector DB + RAG
 chromadb==0.5.0
-sentence-transformers==3.0.0
-
+transformers==4.41.2
+sentence-transformers==2.6.1
 # GitHub + Git
 PyGithub==2.3.0
 gitpython==3.1.43
-
+numpy==1.26.4
 # Streaming
 websockets==12.0
 aiofiles==23.2.1
