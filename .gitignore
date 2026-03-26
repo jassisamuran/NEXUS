@@ -8,3 +8,13 @@ myenv/
 .env
 __pycache__/
 *.pyc
+chroma/myenv/
+chroma/
+.env
+__pycache__/
+*.pyc
+myenv/
+chroma/
+.env
+__pycache__/
+*.pyc
