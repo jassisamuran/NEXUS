@@ -6,6 +6,7 @@ import autogen
 
 from app.config import get_llm_config, settings
 from app.rag.retriever import format_chunks_for_agent, search_codebase
+from app.tools.code_tools import register_code_tools
 from app.tools.github_tools import register_github_tools
 
 
@@ -54,7 +55,8 @@ class NexusOrchestrator:
         )
 
         #       register all tools
-        register_github_tools()
+        register_github_tools(self._create_dummy_agent, self.executor)
+        register_code_tools(self._create_dummy_agent, self.executor)
 
     def _create_dummy_agent(self):
         """Creates a temporary agent just for tool registration."""
@@ -201,7 +203,7 @@ class NexusOrchestrator:
         )
 
         register_github_tools(coder, self.executor)
-        # register_code_tools here
+        register_code_tools(coder, self.executor)
 
         search_result = search_codebase(task, self.task_id, n_results=6)
 
@@ -251,7 +253,7 @@ class NexusOrchestrator:
             """,
         )
         register_github_tools(tester, self.executor)
-        # register_code_tools
+        register_code_tools(tester, self.executor)
 
         test_context = search_codebase("test pytest fixture", self.task_id, n_results=5)
 
