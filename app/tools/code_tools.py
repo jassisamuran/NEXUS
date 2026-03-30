@@ -70,7 +70,7 @@ def register_code_tools(agent, executor):
         except Exception as e:
             return f"Error writing {filepath}: {str(e)}"
 
-    @executor.register_for_executioin()
+    @executor.register_for_execution()
     @agent.register_for_llm(
         description="List all files in the repository. Skips hidden folders, node_modules, __pycache__, venv."
     )
@@ -156,7 +156,7 @@ def register_code_tools(agent, executor):
         timeout: Annotated[
             int, "Timeout in seconds. Default 60. use 120 for slow test suites."
         ] = 60,
-    ):
+    )->str:
         BLOCKED = ["rm -rf /", "mkfs", "dd if=", "format c:", "shutdown", "reboot"]
         for blocked in BLOCKED:
             if blocked in command.lower():
@@ -309,7 +309,7 @@ def register_code_tools(agent, executor):
     def delete_repo_file(
         filepath: Annotated[str, "Relative path to file to delete"],
         repo_dir: Annotated[str, "Repo root directory"],
-    ):
+    )->str:
         full_path = os.path.join(repo_dir, filepath)
 
         if not os.path.exists(full_path):
@@ -329,7 +329,7 @@ def register_code_tools(agent, executor):
         filepath: Annotated[str, "Relative path to file"],
         repo_dir: Annotated[str, "Repo root directory"],
         start_line: Annotated[int, "First line to read (1-indexed)"],
-        end_line: Annotated(int, "Last line to read (inclusive)"),
+        end_line: Annotated[int, "Last line to read (inclusive)"]   ,
     ) -> str:
         full_path = os.path.join(repo_dir, filepath)
 
