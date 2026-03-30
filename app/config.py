@@ -46,7 +46,7 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
-        extra = "ignore"
+        # extra = "ignore"
 
 
 @lru_cache()
@@ -56,13 +56,18 @@ def get_settings() -> Settings:
 
 settings = get_settings()
 
-
 def get_llm_config(fast: bool = False):
     model = settings.OPENAI_MODEL_FAST if fast else settings.OPENAI_MODEL
+
     return {
-        "model": model,
-        "api_key": settings.OPENAI_API_KEY,
+        "config_list": [
+            {
+                "model": model,
+                "api_key": settings.OPENAI_API_KEY,
+            }
+        ],
         "temperature": 0.1,
         "timeout": 180,
         "cache_seed": None,  # disable cache for production streaming
     }
+
