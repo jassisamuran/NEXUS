@@ -34,6 +34,7 @@ class RefreshRequest(BaseModel):
 @router.post("/register", status_code=201)
 async def register(req: RegisterRequest, db: AsyncSession = Depends(get_db)):
     existing = await service.get_user_by_email(db, req.email)
+    print("extding",existing)
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
     user = await service.create_user(db, req.email, req.username, req.password)
@@ -52,7 +53,7 @@ async def login(req: LoginRequest, db: AsyncSession = Depends(get_db)):
     return TokenResponse(access_token=access_token, refresh_token=refresh_token)
 
 
-@router("/refresh", response_model=TokenResponse)
+@router.post("/refresh", response_model=TokenResponse)
 async def refresh(req: RefreshRequest, db: AsyncSession = Depends(get_db)):
     payload = service.decode_token(req.refresh_token)
     if payload.get("type") != "refresh":
