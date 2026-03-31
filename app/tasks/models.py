@@ -71,7 +71,7 @@ class TaskLog(Base):
     agent_name = Column(String(100))
     event_type = Column(String(100))
     content = Column(Text)
-    metadata = Column(JSONB, default=dict)
+    metadata_ = Column(JSONB, default=dict)
     tokens = Column(Integer, default=0)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
