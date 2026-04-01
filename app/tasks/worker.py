@@ -1,5 +1,6 @@
 import os
 import time
+import json
 import shutil
 from datetime import datetime
 from celery import Celery
@@ -35,7 +36,7 @@ def run_task(self,task_id:str,user_id:str,repo_url:str,task_description:str):
     from app.agents.orchestrator import NexusOrchestrator
     import re
 
-    repo_dir=os.path.join(settings.REPO_DIR,task_id)
+    repo_dir=os.path.join(settings.REPOS_DIR,task_id)
     start_time=time.time()
 
     def log(event_type:str,agent:str,message:str,data:dict=None):
@@ -65,6 +66,7 @@ def run_task(self,task_id:str,user_id:str,repo_url:str,task_description:str):
             conn.close()
         except Exception as e:
             print(f"DB update error: {e}")
+            raise
 
     try:
         log('STAGE_START',"system",f"Cloning repository: {repo_url}")
@@ -125,7 +127,7 @@ def run_task(self,task_id:str,user_id:str,repo_url:str,task_description:str):
             "complete", 100, "Complete",
             pr_url=pr_url,
             pr_number=pr_number,
-            files_changed=str(changed_files),
+            files_changed=json.dumps(changed_files),
             completed_at=datetime.utcnow().isoformat(),
             duration_seconds=duration,
         )
@@ -139,8 +141,11 @@ def run_task(self,task_id:str,user_id:str,repo_url:str,task_description:str):
     except Exception as e:
         import traceback
         error_msg = f"{type(e).__name__}: {str(e)}\n{traceback.format_exc()}"
+        print(f"[TASK FAILED] {error_msg}")
+
         log("FAILED", "system", f"Task failed: {str(e)}")
         update_db_status("failed", 0, "Failed", error_message=str(e)[:2000])
+        raise
 
     finally:
         if os.path.exists(repo_dir):

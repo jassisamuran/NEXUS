@@ -74,7 +74,7 @@ async def list_tasks(
         .order_by(desc(Task.created_at))
         .limit(20)
     )
-    t = result.scalars().all()
+    tasks = result.scalars().all()
     return {
         "tasks": [
             {
