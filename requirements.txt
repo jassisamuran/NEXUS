@@ -7,7 +7,7 @@ pydantic==2.10.3
 
 pydantic-settings==2.3.0
 
-argon2
+argon2-cffi
 pydantic[email]
 
 # Database
@@ -27,13 +27,13 @@ celery==5.4.0
 
 # AutoGen + AI
 # pyautogen==0.10.0
-# pyautogen==0.2.0
+pyautogen==0.2.35
 # pyautogen==0.10.0
 # autogen-core==0.7.5
 # autogen-agentchat==0.7.5
-autogen-agentchat==0.4.9
-autogen-core==0.4.9
-autogen-ext[openai]==0.4.9
+# autogen-agentchat==0.4.9
+# autogen-core==0.4.9
+# autogen-ext[openai]==0.4.9
 
 # Vector DB + RAG
 chromadb==0.5.0

@@ -27,7 +27,7 @@ async def get_current_user(
     except Exception:
         raise crendential_exception
 
-    user = await service.get_user_by_email(db, user_id)
+    user = await service.get_user_by_id(db, user_id)
     if not user or not user.is_active:
         raise crendential_exception
     return user

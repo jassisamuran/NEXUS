@@ -2,6 +2,8 @@ import hashlib
 import os
 
 os.environ["ANONYMIZED_TELEMETRY"] = "False"
+from chromadb import HttpClient
+
 
 from typing import Callable, List
 
@@ -27,9 +29,13 @@ ef = embedding_functions.SentenceTransformerEmbeddingFunction(
 )
 
 
-def get_chroma_client():
-    return chromadb.HttpClient(host=settings.CHROMA_HOST, port=settings.CHROMA_PORT)
 
+
+def get_chroma_client():
+    return HttpClient(
+        host=settings.CHROMA_HOST,
+        port=settings.CHROMA_PORT,
+    )
 
 def get_collection(task_id: str):
     client = get_chroma_client()
@@ -75,7 +81,8 @@ def index_repository(
     indexed_chunks = 0
 
     for i, filepath in enumerate(all_files):
-        ext = os.path.splitext(filepath)
+        _, ext = os.path.splitext(filepath) 
+
 
         if ext == ".py":
             chunks = parse_python_file(filepath, repo_path)
@@ -140,7 +147,6 @@ def _chunk_generic_file(filepath: str, repo_root: str, ext: str) -> List[CodeChu
     for i in range(0, len(lines), chunk_size):
         chunk_content = "\n".join(lines[i : i + chunk_size])
         if chunk_content.strip():
-            from rag.ast_parser import CodeChunk
 
 
 
