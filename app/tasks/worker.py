@@ -6,7 +6,7 @@ from datetime import datetime
 from celery import Celery
 from app.config import settings
 from app.streaming.websocket import publish_event
-
+from app.tasks.models import TaskStatus
 celery_app=Celery(
     'nexus',
     broker=settings.REDIS_URL,
@@ -70,13 +70,13 @@ def run_task(self,task_id:str,user_id:str,repo_url:str,task_description:str):
 
     try:
         log('STAGE_START',"system",f"Cloning repository: {repo_url}")
-        update_db_status("cloning",5,"Cloning repository")
+        update_db_status(TaskStatus.CLONING,5,"Cloning repository")
         clone_repository(repo_url,repo_dir)
         log("STAGE_COMPLETE",'system','Repository cloned successfully')
 
         # index
         log('START_STAGE','system','Indexing codebase with semantic embedding....')
-        update_db_status('indexing',15,'INDEXING CODEBASE')
+        update_db_status(TaskStatus.INDEXING,15,'INDEXING CODEBASE')
 
         def index_progress(pct,msg):
             log("PROGRESS",'Indexer',msg,{"percent":pct})
@@ -85,7 +85,7 @@ def run_task(self,task_id:str,user_id:str,repo_url:str,task_description:str):
         log("STAGE_COMPLETE", "system", f"Indexed {chunk_count} code chunks into vector DB")
 
         # run orchestrator
-        update_db_status("planning",25,"planning implementation")
+        update_db_status(TaskStatus.PLANNING,25,"planning implementation")
 
         def agent_log_callback(event_type:str,agent:str,message:str):
             log(event_type,agent,message)
@@ -97,7 +97,7 @@ def run_task(self,task_id:str,user_id:str,repo_url:str,task_description:str):
             log_callback=agent_log_callback
         )
 
-        update_db_status("planning",30)
+        update_db_status(TaskStatus.PLANNING,30)
         results=orchestrator.run(task_description)
 
         pr_url = None
@@ -124,7 +124,7 @@ def run_task(self,task_id:str,user_id:str,repo_url:str,task_description:str):
         duration=int(time.time()-start_time)
 
         update_db_status(
-            "complete", 100, "Complete",
+            TaskStatus.COMPLETE, 100, "Complete",
             pr_url=pr_url,
             pr_number=pr_number,
             files_changed=json.dumps(changed_files),
@@ -144,7 +144,7 @@ def run_task(self,task_id:str,user_id:str,repo_url:str,task_description:str):
         print(f"[TASK FAILED] {error_msg}")
 
         log("FAILED", "system", f"Task failed: {str(e)}")
-        update_db_status("failed", 0, "Failed", error_message=str(e)[:2000])
+        update_db_status(TaskStatus.FAILED, 0, "Failed", error_message=str(e)[:2000])
         raise
 
     finally:

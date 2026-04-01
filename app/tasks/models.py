@@ -35,8 +35,11 @@ class Task(Base):
     task_description = Column(Text, nullable=False)
     branch_name = Column(String(200))
 
-    # Status
-    status = Column(Enum(TaskStatus), default=TaskStatus.QUEUED, index=True)
+    status = Column(
+        Enum(TaskStatus, values_callable=lambda x: [e.value for e in x]),
+        default=TaskStatus.QUEUED,
+        index=True
+        ) 
     progress_percent = Column(Integer, default=0)
     current_stage = Column(String(100))
 
