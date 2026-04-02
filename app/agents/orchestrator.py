@@ -59,23 +59,23 @@ class NexusOrchestrator:
     def run(self, task: str):
         results = {}
 
-        self._log("STAGE_START 1", "system", "Planning...")
+        self._log("STAGE_START", "system", "Planning...")
         plan = self._run_architect_stage(task)
         results["plan"] = plan
 
-        self._log("STAGE_START 2", "system", "Coding...")
+        self._log("STAGE_START", "system", "Coding...")
         code = self._run_coder_stage(task, plan)
         results["code"] = code
 
-        self._log("STAGE_START 3", "system", "Testing...")
+        self._log("STAGE_START", "system", "Testing...")
         tests = self._run_tester_stage(task)
         results["tests"] = tests
 
-        self._log("STAGE_START 4", "system", "Reviewing...")
+        self._log("STAGE_START", "system", "Reviewing...")
         review = self._run_reviewer_stage()
         results["review"] = review
 
-        self._log("STAGE_START 5", "system", "Creating PR...")
+        self._log("STAGE_START", "system", "Creating PR...")
         pr = self._run_git_stage(task, plan)
         results["pr"] = pr
 
