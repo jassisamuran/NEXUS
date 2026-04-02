@@ -88,6 +88,9 @@ def run_task(self,task_id:str,user_id:str,repo_url:str,task_description:str):
         update_db_status(TaskStatus.PLANNING,25,"planning implementation")
 
         def agent_log_callback(event_type:str,agent:str,message:str):
+            if event_type in ("FAILED", "COMPLETE"):
+                event_type = "WARNING"
+
             log(event_type,agent,message)
 
         orchestrator=NexusOrchestrator(
@@ -143,8 +146,8 @@ def run_task(self,task_id:str,user_id:str,repo_url:str,task_description:str):
         error_msg = f"{type(e).__name__}: {str(e)}\n{traceback.format_exc()}"
         print(f"[TASK FAILED] {error_msg}")
 
-        log("FAILED", "system", f"Task failed: {str(e)}")
         update_db_status(TaskStatus.FAILED, 0, "Failed", error_message=str(e)[:2000])
+        log("FAILED", "system", f"Task failed: {str(e)}")
         raise
 
     finally:
@@ -153,7 +156,3 @@ def run_task(self,task_id:str,user_id:str,repo_url:str,task_description:str):
                 shutil.rmtree(repo_dir)
             except Exception:
                 pass
-
-
-
-

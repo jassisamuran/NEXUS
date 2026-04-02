@@ -60,6 +60,8 @@ class WebSocketManager:
                         await websocket.send_json(data)
 
                         if data.get("event_type") in ("COMPLETE", "FAILED"):
+                            await asyncio.sleep(0.2)
+                            # await websocket.close()
                             break
                     except Exception:
                         break

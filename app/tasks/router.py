@@ -126,5 +126,5 @@ async def task_websocket(websocket: WebSocket, task_id: str):
     await ws_manager.connect(websocket, task_id)
     try:
         await ws_manager.listen_and_forward(task_id, websocket)
-    except WebSocketDisconnect:
+    except WebSocketDisconnect: 
         ws_manager.disconnect(websocket, task_id)
