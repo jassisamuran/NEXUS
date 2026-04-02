@@ -34,6 +34,7 @@ class RefreshRequest(BaseModel):
 @router.post("/register", status_code=201)
 async def register(req: RegisterRequest, db: AsyncSession = Depends(get_db)):
     existing = await service.get_user_by_email(db, req.email)
+    print("extding",existing)
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
     user = await service.create_user(db, req.email, req.username, req.password)
@@ -52,7 +53,7 @@ async def login(req: LoginRequest, db: AsyncSession = Depends(get_db)):
     return TokenResponse(access_token=access_token, refresh_token=refresh_token)
 
 
-@router("/refresh", response_model=TokenResponse)
+@router.post("/refresh", response_model=TokenResponse)
 async def refresh(req: RefreshRequest, db: AsyncSession = Depends(get_db)):
     payload = service.decode_token(req.refresh_token)
     if payload.get("type") != "refresh":
@@ -64,3 +65,14 @@ async def refresh(req: RefreshRequest, db: AsyncSession = Depends(get_db)):
     access_token = service.create_access_token({"sub": str(user.id)})
     new_refresh = service.create_refresh_token({"sub": str(user.id)})
     return TokenResponse(access_token=access_token, refresh_token=new_refresh)
+
+
+@router.get("/me")
+async def get_me(current_user: User = Depends(get_current_user)):
+    return {
+        "id": str(current_user.id),
+        "email": current_user.email,
+        "username": current_user.username,
+        "total_tasks": current_user.total_tasks,
+        "total_cost_usd": round(current_user.total_cost_usd, 4),
+    }

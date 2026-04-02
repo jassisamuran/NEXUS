@@ -137,6 +137,7 @@ def register_github_tools(agent, executor):
         except Exception as e:
             return f"Error committing: {str(e)}"
 
+
     @executor.register_for_execution()
     @agent.register_for_llm(
         description="Push the branch and create a GitHub Pull Request"
@@ -145,25 +146,33 @@ def register_github_tools(agent, executor):
         repo_url: Annotated[str, "GitHub repo URL (e.g. https://github.com/user/repo)"],
         branch_name: Annotated[str, "Branch to create PR from"],
         pr_title: Annotated[str, "Pull request title"],
-        pr_body: Annotated[
-            str, "Detailed pull request description with what changed and why"
-        ],
+        pr_body: Annotated[str, "Detailed pull request description with what changed and why"],
         repo_dir: Annotated[str, "The local repository directory path"],
     ) -> str:
         if not gh:
             return "GitHub token not configured. Cannot create PR. Changes are committed locally."
         try:
-            # Push the branch
             local_repo = git.Repo(repo_dir)
-            origin = local_repo.remote("origin")
-            origin.push(branch_name)
 
-            # Create PR via GitHub API
+            auth_push_url = repo_url.rstrip("/").replace(
+                "https://github.com",
+                f"https://{settings.GITHUB_TOKEN}@github.com"
+            )
+            if not auth_push_url.endswith(".git"):
+                auth_push_url += ".git"
+
+            local_repo.git.push(auth_push_url, branch_name, force=True)
+
             repo_name = (
                 repo_url.rstrip("/").split("github.com/")[-1].replace(".git", "")
             )
             gh_repo = gh.get_repo(repo_name)
             default_branch = gh_repo.default_branch
+
+            existing_prs = gh_repo.get_pulls(state="open", head=f"jassisamuran:{branch_name}")
+            for existing_pr in existing_prs:
+                return f"PR already exists: {existing_pr.html_url}\nPR #{existing_pr.number}: {existing_pr.title}"
+
             pr = gh_repo.create_pull(
                 title=pr_title,
                 body=pr_body,
@@ -173,5 +182,3 @@ def register_github_tools(agent, executor):
             return f"PR created: {pr.html_url}\nPR #{pr.number}: {pr.title}"
         except Exception as e:
             return f"Error creating PR: {str(e)}"
-
-    return agent, executor

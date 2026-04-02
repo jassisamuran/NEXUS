@@ -35,8 +35,11 @@ class Task(Base):
     task_description = Column(Text, nullable=False)
     branch_name = Column(String(200))
 
-    # Status
-    status = Column(Enum(TaskStatus), default=TaskStatus.QUEUED, index=True)
+    status = Column(
+        Enum(TaskStatus, values_callable=lambda x: [e.value for e in x]),
+        default=TaskStatus.QUEUED,
+        index=True
+        ) 
     progress_percent = Column(Integer, default=0)
     current_stage = Column(String(100))
 
@@ -71,7 +74,7 @@ class TaskLog(Base):
     agent_name = Column(String(100))
     event_type = Column(String(100))
     content = Column(Text)
-    metadata = Column(JSONB, default=dict)
+    metadata_ = Column(JSONB, default=dict)
     tokens = Column(Integer, default=0)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
