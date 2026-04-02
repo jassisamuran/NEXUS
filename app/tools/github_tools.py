@@ -161,7 +161,6 @@ def register_github_tools(agent, executor):
             if not auth_push_url.endswith(".git"):
                 auth_push_url += ".git"
 
-            # Force push — handles branch already existing on remote from previous runs
             local_repo.git.push(auth_push_url, branch_name, force=True)
 
             repo_name = (
@@ -170,7 +169,6 @@ def register_github_tools(agent, executor):
             gh_repo = gh.get_repo(repo_name)
             default_branch = gh_repo.default_branch
 
-            # Check if PR already exists for this branch before creating
             existing_prs = gh_repo.get_pulls(state="open", head=f"jassisamuran:{branch_name}")
             for existing_pr in existing_prs:
                 return f"PR already exists: {existing_pr.html_url}\nPR #{existing_pr.number}: {existing_pr.title}"
