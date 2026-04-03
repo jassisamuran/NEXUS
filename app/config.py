@@ -67,7 +67,7 @@ def get_llm_config(fast: bool = False):
             }
         ],
         "temperature": 0.1,
-        "timeout": 180,
+        "timeout": 300,
         "cache_seed": None,  # disable cache for production streaming
     }
 
