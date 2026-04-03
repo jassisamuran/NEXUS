@@ -81,7 +81,7 @@ def run_task(self,task_id:str,user_id:str,repo_url:str,task_description:str):
         def index_progress(pct,msg):
             log("PROGRESS",'Indexer',msg,{"percent":pct})
 
-        chunk_count=index_repository(repo_url,task_id,progress_callback=index_progress)
+        chunk_count=index_repository(repo_dir,task_id,progress_callback=index_progress)
         log("STAGE_COMPLETE", "system", f"Indexed {chunk_count} code chunks into vector DB")
 
         # run orchestrator

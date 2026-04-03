@@ -56,9 +56,9 @@ def get_file_contents(task_id: str, filepath: str) -> str:
             pairs = sorted(
                 zip(
                     results["documents"],
-                    results["metadatas"],
+                    results["metadatas"]),
                     key=lambda x: x[1].get("start_line", 0),
-                )
+                
             )
 
             return "\n\n".join(doc for doc, _ in pairs)

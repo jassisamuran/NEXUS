@@ -38,7 +38,7 @@ def parse_python_file(filepath: str, repo_root: str) -> List[CodeChunk]:
     except SyntaxError:
         chunks.append(
             CodeChunk(
-                context=source[:3000],
+                content=source[:3000],
                 filepath=relative_path,
                 chunk_type="module",
                 name=relative_path,
@@ -62,7 +62,7 @@ def parse_python_file(filepath: str, repo_root: str) -> List[CodeChunk]:
     if import_lines:
         chunks.append(
             CodeChunk(
-                context="\n".join(import_lines),
+                content="\n".join(import_lines),
                 filepath=relative_path,
                 chunk_type="import_block",
                 name=f"{relative_path}:imports",
@@ -97,10 +97,10 @@ def parse_python_file(filepath: str, repo_root: str) -> List[CodeChunk]:
             chunk_lines = lines[i : i + 100]
             chunks.append(
                 CodeChunk(
-                    context="\n".join(chunk_lines),
+                    content="\n".join(chunk_lines),
                     filepath=relative_path,
                     chunk_type="module",
-                    name=f"{relative_path:lines_{i}-{i + 100}}",
+                    name=f"{relative_path}:lines_{i}-{i + 100}",
                     start_line=i + 1,
                     end_line=min(i + 100, len(lines)),
                     docstring=None,
@@ -114,12 +114,12 @@ def _extract_function_chunk(node, lines, filepath, source, class_name=None):
     try:
         start = node.lineno - 1
         end = node.end_lineno
-        context = "\n".join(lines[start:end])
+        content = "\n".join(lines[start:end])
         docstring = ast.get_docstring(node) or ""
         name = f"{class_name}.{node.name}" if class_name else node.name
 
         return CodeChunk(
-            context=context,
+            content=content,
             filepath=filepath,
             chunk_type="method" if class_name else "function",
             name=name,
@@ -136,12 +136,12 @@ def _extract_class_chunk(node, lines, filepath, source):
     try:
         start = node.lineno - 1
         sig_end = min(start + 20, node.end_lineno)
-        context = "\n".join(lines[start:sig_end])
+        content = "\n".join(lines[start:sig_end])
         docstring = ast.get_docstring(node) or ""
         methods = [n.name for n in ast.walk(node) if isinstance(n, ast.FunctionDef)]
 
         return CodeChunk(
-            context=context + f"\n# Methods: {', '.join(methods)}",
+            content=content + f"\n# Methods: {', '.join(methods)}",
             filepath=filepath,
             chunk_type="class",
             name=node.name,
