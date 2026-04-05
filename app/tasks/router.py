@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, desc
+from sqlalchemy import select, desc,func
 from pydantic import BaseModel
 import uuid
 from app.database.connection import get_db
@@ -9,6 +9,7 @@ from app.auth.models import User
 from app.auth.dependencies import get_current_user
 from app.tasks.worker import run_task
 from app.streaming.websocket import ws_manager
+
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
@@ -128,3 +129,38 @@ async def task_websocket(websocket: WebSocket, task_id: str):
         await ws_manager.listen_and_forward(task_id, websocket)
     except WebSocketDisconnect: 
         ws_manager.disconnect(websocket, task_id)
+
+
+@router.get("/analytics/costs")
+async def get_cost_analytics(
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(
+        select(
+            func.date(Task.created_at).label("date"),
+            func.sum(Task.cost_usd).label("total_cost"),
+            func.sum(Task.tokens_used).label("total_tokens"),
+            func.count(Task.id).label("task_count"),
+            func.avg(Task.duration_seconds).label("avg_duration"),
+        )
+        .where(Task.user_id == user.id)
+        .group_by(func.date(Task.created_at))
+        .order_by(func.date(Task.created_at).desc())
+        .limit(30)
+    )
+    rows = result.fetchall()
+    return {
+        "daily": [
+            {
+                "date": str(row.date),
+                "cost": round(float(row.total_cost or 0), 4),
+                "tokens": row.total_tokens or 0,
+                "tasks": row.task_count,
+                "avg_duration": round(float(row.avg_duration or 0)),
+            }
+            for row in rows
+        ],
+        "total_cost": sum(r.total_cost or 0 for r in rows),
+        "total_tasks": sum(r.task_count for r in rows),
+    }
