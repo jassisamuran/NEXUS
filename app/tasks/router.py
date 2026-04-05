@@ -164,3 +164,33 @@ async def get_cost_analytics(
         "total_cost": sum(r.total_cost or 0 for r in rows),
         "total_tasks": sum(r.task_count for r in rows),
     }
+
+@router.post("/{task_id}/retry")
+async def retry_task(
+    task_id:str,
+    db:AsyncSession=Depends(get_db),
+    user:User=Depends(get_current_db)
+):
+    task=await get_task_by_id(db,task_id,user.id)
+    if not task:
+        raise HttpException(404,"Task not found")
+    if task.status!=TaskStatus.FAILED:
+        raise HTTPException(400,'Only failed tasks can be retried')
+
+    task.status=TaskStatus.QUEUED
+    task.progress_percent=0
+    task.error_message=None
+    task.pr_url=None
+    task.started_at=None
+    task.completed_at=None
+    await db.flush()
+
+    celery_result=run_task.delay(
+        str(task.id),
+        str(user.id),
+        task.repo_url,
+        task.task_description,
+    )
+    task.celery_task_id=celery_result.id
+
+    return {"task_id":str(task.id),"status":"retrying"}
